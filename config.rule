@@ -1,0 +1,26 @@
+{
+  "server": {
+    "port": ""
+  },
+  "db": {
+    "host": "",
+      "user": "",
+      "password" : "",
+      "database" : "",
+      "charset"  : ""
+  },
+  "alioss": {
+    "AccessKeyId" : "",
+    "AccessKeySecret" : "",
+    "RoleArn" : "",
+    "TokenExpireTime" : ""
+  },
+  "github": {
+    "client_id": "",
+    "client_secret": ""
+  },
+  "algolia": {
+    "appId": "",
+    "appKey": ""
+  }
+}
