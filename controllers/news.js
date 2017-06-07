@@ -74,6 +74,30 @@ module.exports = {
     res.send({status: true, item: newItem})
   },
 
+  delete_index_id: async (req, res) => {
+    let memId = Logic.myid(req)
+    let item = await MBlog.query({where: {id: req.params.action}}).fetch()
+    if (item.get('mem_id') !== memId) {
+      res.send({status: false})
+      return
+    }
+    await item.destroy()
+    res.send({status: true})
+  },
+
+  put_index_id: async (req, res) => {
+    let memId = Logic.myid(req)
+    let item = await MBlog.query({where: {id: req.params.action}}).fetch()
+    if (item.get('mem_id') !== memId) {
+      res.send({status: false})
+      return
+    }
+    item.set('con', req.body.con)
+    item.save().then(() => {
+      res.send({status: true})
+    })
+  },
+
   // 最佳
   get_best: (req, res) => {
     let period = req.query.period
