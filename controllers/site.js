@@ -14,7 +14,7 @@ module.exports = {
 
   // 前端客申请
   post_apply: async (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
       return

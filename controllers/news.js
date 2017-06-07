@@ -2,6 +2,9 @@ const MBlog = require('../models/microblog')
 const Logic = require('../lib/logic')
 const moment = require('moment')
 module.exports = {
+  get_test: async (req, res) => {
+    res.send(res.locals.login)
+  },
   get_index: async (req, res) => {
     let limit = Math.min((req.query.limit || 10), 100)
     let skip = parseInt(req.query.skip || 0)
@@ -47,7 +50,7 @@ module.exports = {
   },
 
   post_index: async (req, res) => {
-    let me = await Logic.me(req)
+    let me = await Logic.me(res)
     if (!me || me.get('iswebker') === 'NO') {
       res.send({status: false})
       return
@@ -75,7 +78,7 @@ module.exports = {
   },
 
   delete_index_id: async (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     let item = await MBlog.query({where: {id: req.params.action}}).fetch()
     if (item.get('mem_id') !== memId) {
       res.send({status: false})
@@ -86,7 +89,7 @@ module.exports = {
   },
 
   put_index_id: async (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     let item = await MBlog.query({where: {id: req.params.action}}).fetch()
     if (item.get('mem_id') !== memId) {
       res.send({status: false})

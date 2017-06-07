@@ -5,7 +5,7 @@ module.exports = {
   get_index: async (req, res) => {
     let limit = Math.min((req.query.limit || 10), 20)
     let skip = parseInt(req.query.skip || 0)
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
       return
@@ -30,7 +30,7 @@ module.exports = {
     })
   },
   get_unread: async (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
       return

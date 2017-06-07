@@ -4,11 +4,11 @@ const Oper = require('../models/oper')
 
 
 // 获取当前登录会员喜欢的评论
-let getMyFavors = (req) => {
+let getMyFavors = (req, res) => {
   if (!req.headers.atoken) {
     return Promise.resolve([])
   }
-  let memId = Logic.myid(req)
+  let memId = res.locals.mid
   if (!memId) {
     return Promise.resolve([])
   }
@@ -63,7 +63,7 @@ module.exports = {
     })
   },
   post_index: async (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
       return
@@ -86,7 +86,7 @@ module.exports = {
   },
 
   delete_index_id: (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     Comment.query({where: {id: req.params.action}}).fetch().then(item => {
       if (item.get('mem_id') !== memId) {
         res.send({status: false})
@@ -107,7 +107,7 @@ module.exports = {
   },
 
   put_index_id: (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     Comment.query({where: {id: req.params.action}}).fetch().then(item => {
       if (item.get('mem_id') !== memId) {
         res.send({status: false})

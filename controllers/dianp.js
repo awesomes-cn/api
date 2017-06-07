@@ -3,7 +3,7 @@ const Logic = require('../lib/logic')
 
 module.exports = {
   post_index: async (req, res) => {
-    let me = await Logic.me(req)
+    let me = await Logic.me(res)
     if (!me || me.get('iswebker') === 'NO') {
       res.send({status: false})
       return

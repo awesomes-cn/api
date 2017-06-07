@@ -30,7 +30,7 @@ module.exports = {
   },
 
   get_is: (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({has: false})
       return
@@ -45,7 +45,7 @@ module.exports = {
   },
 
   post_index: (req, res) => {
-    let memId = Logic.myid(req)
+    let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
       return

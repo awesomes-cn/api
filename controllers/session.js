@@ -1,6 +1,7 @@
 const Mem = require('../models/mem')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+const Config = require('../config')
 
 module.exports = {
   // 登录
@@ -9,7 +10,7 @@ module.exports = {
     let pwd = crypto.createHash('md5').update(req.body.pwd).digest('hex')
     Mem.where({email: uid, pwd: pwd}).fetch().then(data => {
       if (data) {
-        let token = jwt.sign({ id: data.id }, 'hxh', { expiresIn: '5h' })
+        let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '5h' })
         res.send({
           status: true,
           token: token,
@@ -31,13 +32,13 @@ module.exports = {
       res.send({status: false})
       return
     }
-    jwt.verify(req.headers.atoken, 'hxh', (err, decoded) => {
+    jwt.verify(req.headers.atoken, Config.jwtkey, (err, decoded) => {
       if (err) {
         res.send({status: false})
       }
       Mem.where({id: (decoded || {}).id}).fetch().then(data => {
         if (data) {
-          let token = jwt.sign({ id: data.id }, 'hxh', { expiresIn: '5h' })
+          let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '5h' })
           res.send({
             status: true,
             token: token,
