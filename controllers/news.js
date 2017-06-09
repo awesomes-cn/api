@@ -151,5 +151,24 @@ module.exports = {
         res.send('nobest')
       }
     })
+  },
+
+  get_prevnext: async (req, res) => {
+    let currentID = parseInt(req.params.id)
+    let direction = req.query.direction
+    let dist = null
+    if (direction === 'prev') {
+      dist = await MBlog.where('id', '<', currentID).query({
+        limit: 1,
+        orderByRaw: 'id desc'
+      }).fetch()
+    } else {
+      dist = await MBlog.where('id', '>', currentID).query({
+        limit: 1
+      }).fetch()
+    }
+    res.send({
+      dist: (dist ? dist.id : 0)
+    })
   }
 }
