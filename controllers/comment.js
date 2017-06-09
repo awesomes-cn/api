@@ -51,7 +51,7 @@ module.exports = {
         }]
       }),
       Comment.where(where).count('id'),
-      getMyFavors(req)
+      getMyFavors(req, res)
     ])
     let result = comments.toJSON()
     result.forEach(item => {

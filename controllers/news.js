@@ -49,6 +49,22 @@ module.exports = {
     })
   },
 
+  get_index_id: async (req, res) => {
+    let item = await MBlog.query({where: {id: req.params.action}}).fetch({
+      withRelated: [
+        {
+          'mem': function (mqu) {
+            return mqu.select('id', 'nc', 'avatar')
+          }
+        }, {
+          'mem.mem_info': function (query) {
+            query.select('company', 'mem_id')
+          }
+        }]
+    })
+    res.send(item)
+  },
+
   post_index: async (req, res) => {
     let me = await Logic.me(res)
     if (!me || me.get('iswebker') === 'NO') {
