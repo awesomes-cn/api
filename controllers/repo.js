@@ -168,7 +168,7 @@ module.exports = {
     Repo.query({
       limit: limit,
       orderByRaw: orderby,
-      select: ['id', 'name', 'cover', 'description_cn', 'owner', 'alia', 'pushed_at']
+      select: ['id', 'name', 'cover', 'description_cn', 'owner', 'alia', 'pushed_at', 'trend']
     }).fetchAll().then((repos) => {
       res.send(repos)
     }).catch((err) => {
