@@ -56,6 +56,7 @@ let Comment = DB.Model.extend({
         link: 'news'
       }
     }[model.get('typ')]
+    if (!Model) { return Promise.resolve() }
     let table = require(Model.table)
 
     let [fromem, distobj] = await Promise.all([
