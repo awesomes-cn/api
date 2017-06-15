@@ -32,27 +32,27 @@ module.exports = {
       res.send({status: false})
       return
     }
-    jwt.verify(req.headers.atoken, Config.jwtkey, (err, decoded) => {
-      if (err) {
+    let memId = res.locals.mid
+    if (!memId) {
+      res.send({status: false})
+      return
+    }
+    Mem.where({id: memId}).fetch().then(data => {
+      if (data) {
+        let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '5h' })
+        res.send({
+          status: true,
+          token: token,
+          mem: {
+            id: data.id,
+            nc: data.get('nc'),
+            avatar: data.get('avatar'),
+            iswebker: data.get('iswebker')
+          }
+        })
+      } else {
         res.send({status: false})
       }
-      Mem.where({id: (decoded || {}).id}).fetch().then(data => {
-        if (data) {
-          let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '5h' })
-          res.send({
-            status: true,
-            token: token,
-            mem: {
-              id: data.id,
-              nc: data.get('nc'),
-              avatar: data.get('avatar'),
-              iswebker: data.get('iswebker')
-            }
-          })
-        } else {
-          res.send({status: false})
-        }
-      })
     })
   }
 }

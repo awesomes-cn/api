@@ -80,5 +80,4 @@ let Oper = DB.Model.extend({
   }
 })
 
-
 module.exports = Oper

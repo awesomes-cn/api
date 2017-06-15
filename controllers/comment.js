@@ -1,5 +1,4 @@
 const Comment = require('../models/comment')
-const Logic = require('../lib/logic')
 const Oper = require('../models/oper')
 
 
@@ -23,7 +22,6 @@ let getMyFavors = (req, res) => {
     })
   })
 }
-
 
 module.exports = {
   get_index: async (req, res) => {

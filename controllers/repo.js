@@ -52,7 +52,7 @@ module.exports = {
     let query = {
       limit: limit,
       offset: skip,
-      select: ['id', 'name', 'cover', 'description_cn', 'owner', 'alia', 'using', 'mark', 'pushed_at']
+      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'using', 'mark', 'pushed_at']
     }
 
     query.orderByRaw = {
@@ -88,7 +88,6 @@ module.exports = {
     })
   },
 
-
   get_index_id: (req, res) => {
     Repo.query({where: { owner: req.params.owner, alia: req.params.alia }}).fetch().then(data => {
       let _repo = data.toJSON()
@@ -109,11 +108,23 @@ module.exports = {
     })
   },
 
+  // 更新
+  put_index_id: async (req, res) => {
+    let item = await Repo.query({where: {id: parseInt(req.params.action)}}).fetch()
+    ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'typcd', 'tag', 'hidetags', 'recommend', 'cover'].forEach(key => {
+      if (req.body[key]) {
+        item.set(key, req.body[key])
+      }
+    })
+    await item.save()
+    res.send({status: true})
+  },
+
   // 最新发布
   get_latest: (req, res) => {
     // let limit = Math.min((req.query.limit || 10), 100)
     // let skip = req.query.skip || 0
-    Repo.query({limit: 8, offset: 0, orderByRaw: 'id desc', select: ['id', 'name', 'cover', 'description_cn', 'owner', 'alia']}).fetchAll().then((repo) => {
+    Repo.query({limit: 8, offset: 0, orderByRaw: 'id desc', select: ['id', 'name', 'cover', 'description', 'description_cn', 'owner', 'alia']}).fetchAll().then((repo) => {
       res.send(repo)
     }).catch((err) => {
       console.error(err)
@@ -168,7 +179,7 @@ module.exports = {
     Repo.query({
       limit: limit,
       orderByRaw: orderby,
-      select: ['id', 'name', 'cover', 'description_cn', 'owner', 'alia', 'pushed_at', 'trend']
+      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'pushed_at', 'trend']
     }).fetchAll().then((repos) => {
       res.send(repos)
     }).catch((err) => {

@@ -3,7 +3,9 @@ var app = express()
 var router = require('./lib/router')
 var bodyParser = require('body-parser')
 var login = require('./middleware/login')
+var busboy = require('connect-busboy')
 
+app.use(busboy())
 app.use(bodyParser.json())
 
 app.all('*', (req, res, next) => {
