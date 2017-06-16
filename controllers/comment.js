@@ -83,6 +83,7 @@ module.exports = {
     res.send({status: true, item: backitem})
   },
 
+  // 删除
   delete_index_id: (req, res) => {
     let memId = res.locals.mid
     Comment.query({where: {id: req.params.action}}).fetch().then(item => {
@@ -104,6 +105,7 @@ module.exports = {
     })
   },
 
+  // 更新
   put_index_id: (req, res) => {
     let memId = res.locals.mid
     Comment.query({where: {id: req.params.action}}).fetch().then(item => {

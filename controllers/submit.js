@@ -3,6 +3,7 @@ const localEnv = require('../config')
 const request = require('request')
 const Repo = require('../models/repo')
 const Category = require('../models/category')
+const Auth = require('../middleware/auth')
 
 let fetchReadme = (reponame) => {
   const readmeUrl = `https://api.github.com/repos/${reponame}/readme?client_id=${localEnv.github.client_id}&client_secret=${localEnv.github.client_secret}`
@@ -46,6 +47,7 @@ module.exports = {
   },
   // 提取
   get_fetch: async (req, res) => {
+    await Auth.isAdmin(req, res)
     let _submit = await Submit.where({
       id: req.params.id
     }).fetch()

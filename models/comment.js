@@ -57,6 +57,11 @@ let Comment = DB.Model.extend({
       }
     }[model.get('typ')]
     if (!Model) { return Promise.resolve() }
+    let domain = 'main'
+
+    if (Model.link === 'news') {
+      domain = 'news'
+    }
     let table = require(Model.table)
 
     let [fromem, distobj] = await Promise.all([
@@ -71,13 +76,13 @@ let Comment = DB.Model.extend({
     let toActions = distids.map(async (mem) => {
       await new Msg({
         title: '评论',
+        domain: domain,
         con: `[${fromem.get('nc')}](/mem/${fromem.get('id')}) 评论了你的 [${Model.name}](/${Model.link}/${model.get('idcd')})`,
         status: 'UNREAD',
         to: toid,
         typ: 'comment'
       }).save()
     })
-
 
     // 分析 @ 到的用户发送通知
     let ncs = (model.get('con').match(/@\S+/g) || []).map(nc => {
@@ -95,6 +100,7 @@ let Comment = DB.Model.extend({
     let atActions = atids.map(async (mem) => {
       await new Msg({
         title: '@',
+        domain: domain,
         con: `[${fromem.get('nc')}](/mem/${fromem.get('id')}) 在 [${Model.name}](/${Model.link}/${model.get('idcd')}) 中提到了你`,
         status: 'UNREAD',
         to: mem,
@@ -108,6 +114,5 @@ let Comment = DB.Model.extend({
     ])
   }
 })
-
 
 module.exports = Comment

@@ -1,6 +1,5 @@
 const Mem = require('../models/mem')
 const Oper = require('../models/oper')
-const Logic = require('../lib/logic')
 
 module.exports = {
   get_index: (req, res) => {

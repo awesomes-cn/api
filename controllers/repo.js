@@ -5,6 +5,7 @@ const algoliasearch = require('algoliasearch')
 const localEnv = require('../config.json')
 const Cache = require('../lib/cache')
 const Logic = require('../lib/logic')
+const Auth = require('../middleware/auth')
 
 let searchGo = (key, hitsPerPage, page) => {
   if (!key || key.trim() === '') {
@@ -88,28 +89,31 @@ module.exports = {
     })
   },
 
-  get_index_id: (req, res) => {
-    Repo.query({where: { owner: req.params.owner, alia: req.params.alia }}).fetch().then(data => {
-      let _repo = data.toJSON()
-      Oper.query({
-        where: {opertyp: 'USING', typ: 'REPO', idcd: data.id},
-        limit: 5,
-        orderByRaw: 'id desc'
-      }).fetchAll({
-        withRelated: [{
-          'mem': function (mqu) {
-            return mqu.select('id', 'nc', 'avatar')
-          }
-        }]
-      }).then(using => {
-        _repo.usings = using
-        res.send(_repo)
-      })
+  get_index_id: async (req, res) => {
+    let data = await Repo.query({where: { owner: req.params.owner, alia: req.params.alia }}).fetch()
+    if (!data) {
+      res.send(404)
+    }
+    let _repo = data.toJSON()
+    Oper.query({
+      where: {opertyp: 'USING', typ: 'REPO', idcd: data.id},
+      limit: 5,
+      orderByRaw: 'id desc'
+    }).fetchAll({
+      withRelated: [{
+        'mem': function (mqu) {
+          return mqu.select('id', 'nc', 'avatar')
+        }
+      }]
+    }).then(using => {
+      _repo.usings = using
+      res.send(_repo)
     })
   },
 
   // 更新
   put_index_id: async (req, res) => {
+    await Auth.isAdmin(req, res)
     let item = await Repo.query({where: {id: parseInt(req.params.action)}}).fetch()
     ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'typcd', 'tag', 'hidetags', 'recommend', 'cover'].forEach(key => {
       if (req.body[key]) {
@@ -122,8 +126,6 @@ module.exports = {
 
   // 最新发布
   get_latest: (req, res) => {
-    // let limit = Math.min((req.query.limit || 10), 100)
-    // let skip = req.query.skip || 0
     Repo.query({limit: 8, offset: 0, orderByRaw: 'id desc', select: ['id', 'name', 'cover', 'description', 'description_cn', 'owner', 'alia']}).fetchAll().then((repo) => {
       res.send(repo)
     }).catch((err) => {
