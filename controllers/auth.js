@@ -10,7 +10,7 @@ module.exports = {
     res.redirect(`http://github.com/login/oauth/authorize?client_id=${config.github.client_id}&redirect_uri=${config.github.redirect_uri}&state=${parseInt(Math.random() * 10000)}`)
   },
   get_return: async (req, res) => {
-    let webReturn = `http://192.168.26.128:3333/auth?token=`
+    let webReturn = `https://www.awesomes.cn/auth?token=`
     let token = await new Promise(resolve => {
       request({
         method: 'POST',
