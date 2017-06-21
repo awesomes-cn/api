@@ -1,5 +1,6 @@
 const Mem = require('../models/mem')
 const Oper = require('../models/oper')
+const Logic = require('../lib/logic')
 
 module.exports = {
   get_index: (req, res) => {
@@ -43,7 +44,7 @@ module.exports = {
     })
   },
 
-  post_index: (req, res) => {
+  post_index: async (req, res) => {
     let memId = res.locals.mid
     if (!memId) {
       res.send({status: false})
@@ -57,24 +58,23 @@ module.exports = {
       pwoutsesion[key] = req.body[key]
     })
 
-    Oper.query({where: params}).fetch().then(data => {
-      if (data) {
-        data.destroy().then((model) => {
-          Oper.updateTarget(new Oper(pwoutsesion)).then(amount => {
-            res.send({has: false, amount: amount})
-          })
-        })
-      } else {
-        Oper.maxOrder({opertyp: 'USING', mem_id: memId}).then(maxOrder => {
-          params.order = maxOrder + 10000
+    let oldOper = await Oper.query({where: params}).fetch()
 
-          new Oper(params).save().then(model => {
-            Oper.sameAmount(pwoutsesion).then(amount => {
-              res.send({has: true, amount: amount})
-            })
-          })
-        })
-      }
-    })
+    if (oldOper) {
+      await oldOper.destroy()
+      let amount = await Oper.updateTarget(new Oper(pwoutsesion))
+      res.send({has: false, amount: amount})
+      return
+    }
+    if (req.body.opertyp === 'USING') {
+      let maxOrder = await Oper.maxOrder({opertyp: 'USING', mem_id: memId})
+      params.order = maxOrder + 10000
+    }
+    await new Oper(params).save()
+    let amount = await Oper.sameAmount(pwoutsesion)
+    res.send({has: true, amount: amount})
+  },
+  get_ids: async (req, res) => {
+    res.send(await Logic.fetchMyOpers(req, req.query.opertyp, req.query.typ))
   }
 }
