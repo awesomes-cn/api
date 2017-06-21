@@ -72,7 +72,7 @@ module.exports = {
       return
     }
     let params = {mem_id: me.id}
-    ;['con'].forEach(key => {
+    ;['con', 'picture'].forEach(key => {
       params[key] = req.body[key]
     })
 
@@ -111,7 +111,9 @@ module.exports = {
       res.send({status: false})
       return
     }
-    item.set('con', req.body.con)
+    ;['con', 'picture'].forEach(key => {
+      item.set(key, req.body[key])
+    })
     item.save().then(() => {
       res.send({status: true})
     })
