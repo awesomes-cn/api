@@ -177,7 +177,7 @@ module.exports = {
     if (req.query.sort === 'trend') {
       orderby = 'trend desc'
     }
-    let limit = Math.min((req.query.limit || 10), 100)
+    let limit = 100
     Repo.query({
       limit: limit,
       orderByRaw: orderby,
