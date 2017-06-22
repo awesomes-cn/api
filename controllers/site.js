@@ -1,6 +1,5 @@
 let Link = require('../models/link')
 let Msg = require('../models/msg')
-const Logic = require('../lib/logic')
 
 module.exports = {
   // 获取友情链接

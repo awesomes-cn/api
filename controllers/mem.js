@@ -1,5 +1,6 @@
 const Mem = require('../models/mem')
 const Oper = require('../models/oper')
+const Auth = require('../middleware/auth')
 
 module.exports = {
   get_index_id: function (req, res) {
@@ -42,8 +43,15 @@ module.exports = {
       })
     })
   },
-
   // 我在用
   get_using: (req, res) => {
+  },
+  // 设置为情报员
+  post_setwebker: async (req, res) => {
+    await Auth.isAdmin(req, res)
+    let mem = await Mem.where({id: req.params.id}).fetch()
+    mem.set('iswebker', 'YES')
+    await mem.save()
+    res.send({status: true})
   }
 }
