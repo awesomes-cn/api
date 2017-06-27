@@ -3,6 +3,7 @@ const Logic = require('../lib/logic')
 const moment = require('moment')
 const phantom = require('phantom')
 const aliyun = require('../lib/aliyun')
+const localEnv = require('../config.json')
 
 module.exports = {
   get_test: async (req, res) => {
@@ -193,7 +194,7 @@ module.exports = {
 
     const instance = await phantom.create()
     const page = await instance.createPage()
-    await page.open(`http://192.168.26.128:3334/news/${req.params.id}/screenshot`)
+    await page.open(`#{localEnv.client.news}/news/${req.params.id}/screenshot`)
     var base64 = await page.renderBase64('PNG')
     var buffer = new Buffer(base64, 'base64')
     await aliyun.upload(buffer, distName)
