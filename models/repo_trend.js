@@ -1,6 +1,6 @@
 const DB = require('../lib/db')
 
 module.exports = DB.Model.extend({
-  tableName: 'repos',
+  tableName: 'repo_trends',
   hasTimestamps: true
 })

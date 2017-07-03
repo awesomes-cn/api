@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "task": "node lib/task.js",
-    "migration": "knex migrate:latest"
+    "migration": "knex migrate:latest",
+    "task": "node task/build"
   },
   "author": "",
   "license": "ISC",
