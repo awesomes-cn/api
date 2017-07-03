@@ -17,6 +17,7 @@
     "bookshelf": "^0.10.3",
     "co": "^4.6.0",
     "connect-busboy": "^0.0.2",
+    "crontab": "^1.1.3",
     "express": "^4.15.2",
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.8",
