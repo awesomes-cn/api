@@ -178,7 +178,7 @@ module.exports = {
       orderby = 'trend desc'
     }
     let limit = 100
-    Repo.query({
+    Repo.where('rootyp', '!=', 'Nodejs').query({
       limit: limit,
       orderByRaw: orderby,
       select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'pushed_at', 'trend']
