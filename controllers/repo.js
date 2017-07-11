@@ -115,10 +115,8 @@ module.exports = {
   put_index_id: async (req, res) => {
     await Auth.isAdmin(req, res)
     let item = await Repo.query({where: {id: parseInt(req.params.action)}}).fetch()
-    ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'typcd', 'tag', 'hidetags', 'recommend', 'cover'].forEach(key => {
-      if (req.body[key]) {
-        item.set(key, req.body[key])
-      }
+    ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'rootyp_zh', 'typcd', 'typcd_zh', 'tag', 'hidetags', 'recommend', 'cover'].forEach(key => {
+      item.set(key, req.body[key])
     })
     await item.save()
     res.send({status: true})

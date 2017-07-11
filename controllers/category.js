@@ -17,7 +17,9 @@ module.exports = {
 
   // 完整分类
   get_all: (req, res) => {
-    Category.where({group: 'REPO'}).query({select: ['key', 'sdesc', 'icon', 'parent', 'typcd']})
+    Category.where({group: 'REPO'}).query({
+      select: ['id', 'key', 'sdesc', 'icon', 'parent', 'typcd']
+    })
     .fetchAll().then((cates) => {
       res.send(cates)
     })

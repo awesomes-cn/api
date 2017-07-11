@@ -4,7 +4,13 @@ module.exports = {
   get_index_id: async (req, res) => {
     let sub = await Subject.query({
       where: { key: req.params.name }
-    }).fetch()
+    }).fetch({
+      withRelated: [{
+        repo: query => {
+          query.select('html_url', 'id')
+        }
+      }]
+    })
 
     sub = sub.toJSON()
     sub.repos = await Repo.where('tag', 'LIKE', `%${sub.title}%`).query({
