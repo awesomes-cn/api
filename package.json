@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "algoliasearch": "^3.22.1",
+    "algoliasearch": "^3.24.0",
     "ali-oss": "^4.8.0",
     "body-parser": "^1.17.1",
     "bookshelf": "^0.10.3",
