@@ -10,6 +10,9 @@ const TableMap = {
     table: 'msg',
     where: {level: 'admin', typ: 'webker-apply'},
     keys: ['con', 'from']
+  },
+  comment: {
+    keys: ['typ', 'idcd', 'mem_id', 'con']
   }
 }
 
@@ -44,7 +47,7 @@ module.exports = {
     let _table = req.body.table
     let map = TableMap[_table]
     _table = map.table || _table
-    let maps = ['mem', 'submit', 'msg']
+    let maps = ['mem', 'submit', 'msg', 'comment']
     if (maps.indexOf(_table) < 0) {
       res.send({
         status: false

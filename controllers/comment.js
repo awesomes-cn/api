@@ -1,6 +1,6 @@
 const Comment = require('../models/comment')
 const Oper = require('../models/oper')
-
+const Config = require('../config')
 
 // 获取当前登录会员喜欢的评论
 let getMyFavors = (req, res) => {
@@ -118,5 +118,26 @@ module.exports = {
         res.send({status: true})
       })
     })
+  },
+
+  // target
+  get_target: async (req, res) => {
+    let _comment = await Comment.where({
+      id: req.params.id
+    }).fetch()
+    let Model = {
+      REPO: {
+        route: async () => {
+          let Repo = require('../models/repo')
+          let _repo = await Repo.where({id: _comment.get('idcd')}).fetch()
+          return `${Config.client.main}/repo/${_repo.get('owner')}/${_repo.get('alia')}`
+        }
+      },
+      NEWS: {
+        route: `${Config.client.news}/news/${_comment.get('idcd')}`
+      }
+    }[_comment.get('typ')]
+    let url = (typeof Model.route === 'string') ? Model.route : await Model.route()
+    res.redirect(url)
   }
 }
