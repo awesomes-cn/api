@@ -1,5 +1,6 @@
+// 计算前端库的趋势
+
 const Repo = require('../models/repo')
-const RepoHelper = require('../lib/repo')
 const RepoTrend = require('../models/repo_trend')
 
 let nowDay = new Date()

@@ -1,11 +1,13 @@
 const Repo = require('../models/repo')
 const Oper = require('../models/oper')
+const Release = require('../models/release')
 const Dianp = require('../models/dianp')
 const algoliasearch = require('algoliasearch')
 const localEnv = require('../config.json')
 const Cache = require('../lib/cache')
 const Logic = require('../lib/logic')
 const Auth = require('../middleware/auth')
+
 
 let searchGo = (key, hitsPerPage, page) => {
   if (!key || key.trim() === '') {
@@ -185,5 +187,20 @@ module.exports = {
     }).catch((err) => {
       console.error(err)
     })
+  },
+
+  // 最新发布版本
+  get_releases: async (req, res) => {
+    var addDays = require('date-fns/add_days')
+    let fiveDaysAgo = addDays((new Date), -5)
+    res.send(await Release.where('published_at', '>=', fiveDaysAgo).query({
+      orderByRaw: 'published_at desc'
+    }).fetchAll({
+      withRelated: [{
+        repo: query => {
+          query.select('id', 'name', 'cover', 'full_name')
+        }
+      }]
+    }))
   }
 }
