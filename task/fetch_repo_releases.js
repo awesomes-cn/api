@@ -12,7 +12,7 @@ let fetchOne = async item => {
   await new Promise(reolve => {
     setTimeout(function () {
       reolve()
-    }, 1000)
+    }, 1500)
   })
   let data = await RepoHelper.fetchLatestVersion(item)
   if (!data) { return }
