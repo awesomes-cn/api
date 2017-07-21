@@ -27,7 +27,7 @@ let fetchOne = async item => {
       tag_name: data.tag_name
     }
   }).fetch()
-  if (!_old) { return }
+  if (_old) { return }
   await Release.forge({
     repo_id: item.id,
     tag_name: data.tag_name,
