@@ -12,7 +12,7 @@ let fetchOne = async item => {
   await new Promise(reolve => {
     setTimeout(function () {
       reolve()
-    }, 800)
+    }, 1000)
   })
   let data = await RepoHelper.fetchLatestVersion(item)
   if (!data) { return }
@@ -21,9 +21,11 @@ let fetchOne = async item => {
     return
   }
   let _old = await Release.query({
-    repo_id: item.id,
     orderByRaw: 'id desc',
-    tag_name: data.tag_name
+    where: {
+      repo_id: item.id,
+      tag_name: data.tag_name
+    }
   }).fetch()
   if (!_old) { return }
   await Release.forge({
