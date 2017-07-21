@@ -198,7 +198,7 @@ module.exports = {
     }).fetchAll({
       withRelated: [{
         repo: query => {
-          query.select('id', 'name', 'cover', 'full_name')
+          query.select('id', 'name', 'cover', 'full_name', 'owner', 'alia')
         }
       }]
     }))
