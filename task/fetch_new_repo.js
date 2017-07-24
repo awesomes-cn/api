@@ -7,7 +7,7 @@ const DF = require('date-fns')
 let monthsAgo = DF.addMonths((new Date), -3)
 
 // 提取多少个
-const amount = 3
+var amount = 3
 
 // 是否满足条件
 let isAllow = async repoData => {
