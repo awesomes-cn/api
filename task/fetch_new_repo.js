@@ -25,7 +25,7 @@ let isAllow = async repoData => {
   for (let k in languages) {
     keys.push(k)
   }
-  let cond3 = ['JavaScript', 'HTML', 'TypeScript', 'Sass', 'Vue'].indexOf(keys[0]) > -1
+  let cond3 = ['JavaScript', 'HTML', 'CSS', 'TypeScript', 'Sass', 'Vue'].indexOf(keys[0]) > -1
 
   return cond3
 }
