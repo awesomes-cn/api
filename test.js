@@ -1,10 +1,8 @@
-const Release = require('./models/release')
+const Translation = require('./lib/translation')
 
-async function  say() {
-    let _old = await Release.where({
-      repo_id: 24,
-      tag_name: 'v3.3.0'
-    }).fetch()
+let say = async () => {
+  let w = await Translation('sheet')
+  console.log(w)
 }
 
 say()
