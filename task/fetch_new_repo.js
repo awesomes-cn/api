@@ -31,7 +31,10 @@ let isAllow = async repoData => {
 }
 
 let fetchRepo = async id => {
-  let _submit = await Submit.where('id', '>', id).where({status: 'UNREAD'}).fetch()
+  let _submit = await Submit.where('id', '<', id).where({status: 'UNREAD'}).query({
+    orderByRaw: 'id desc',
+    limit: 1
+  }).fetch()
   if (!_submit) { return }
   console.log('====', _submit.reponame())
   let repoData = await RepoHelper.fetch(_submit.reponame())
@@ -54,4 +57,4 @@ let fetchRepo = async id => {
   }
 }
 
-fetchRepo(1)
+fetchRepo(100000000)
