@@ -8,7 +8,6 @@ const Cache = require('../lib/cache')
 const Logic = require('../lib/logic')
 const Auth = require('../middleware/auth')
 
-
 let searchGo = (key, hitsPerPage, page) => {
   if (!key || key.trim() === '') {
     return Promise.resolve({

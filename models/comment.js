@@ -38,7 +38,9 @@ let Comment = DB.Model.extend({
       table.query({where: {id: model.get('idcd')}}).fetch()
     ])
     distobj.set(Model.field, count)
-    await distobj.save()
+    let obj = {id: distobj.get('id')}
+    obj[Model.field] = count
+    await table.forge(obj).save()
     return count
   },
 

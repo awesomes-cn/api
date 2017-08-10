@@ -4,11 +4,45 @@ const moment = require('moment')
 const phantom = require('phantom')
 const aliyun = require('../lib/aliyun')
 const localEnv = require('../config.json')
+const Cache = require('../lib/cache')
+const algoliasearch = require('algoliasearch')
+
+let searchGo = (key, hitsPerPage, page) => {
+  if (!key || key.trim() === '') {
+    return Promise.resolve({
+      haseach: false,
+      ids: []
+    })
+  }
+  let cacheKey = `search-news-${key.trim()}-${page}`
+  return Cache.ensure(cacheKey, 60 * 60 * 24 * 2, () => {
+    let client = algoliasearch(localEnv.algolia.appId, localEnv.algolia.appKey)
+    let index = client.initIndex('news')
+    return new Promise(resolve => {
+      index.search(key, {
+        hitsPerPage: hitsPerPage,
+        page: page
+      }, function searchDone (err, content) {
+        if (err) {
+          resolve({
+            haseach: true,
+            ids: []
+          })
+          return
+        }
+        resolve({
+          haseach: true,
+          total: content.nbHits,
+          ids: content.hits.map(item => {
+            return item.objectID
+          })
+        })
+      })
+    })
+  })
+}
 
 module.exports = {
-  get_test: async (req, res) => {
-    res.send(res.locals.login)
-  },
   get_index: async (req, res) => {
     let limit = Math.min((req.query.limit || 10), 100)
     let skip = parseInt(req.query.skip || 0)
@@ -24,10 +58,17 @@ module.exports = {
       orderByRaw: 'id desc',
       where: where
     }
+    let search = req.query.search
+    let page = (skip / limit) + 1
+    let result = await searchGo(search, limit, page - 1)
+    let myQuery = MBlog
+    if (result.haseach) {
+      myQuery = MBlog.where('id', 'in', result.ids)
+    }
 
     let [count, newss, favors] = await Promise.all([
       MBlog.where(where).count('id'),
-      MBlog.query(query).fetchAll({
+      myQuery.query(query).fetchAll({
         withRelated: [
           {
             'mem': function (mqu) {
@@ -42,14 +83,14 @@ module.exports = {
       Logic.fetchMyOpers(req, 'FAVOR', 'NEWS')
     ])
 
-    let result = newss.toJSON()
-    result.forEach(item => {
+    let resultData = newss.toJSON()
+    resultData.forEach(item => {
       item.isFavor = favors.indexOf(item.id) > -1
     })
 
     res.send({
-      items: result,
-      count: count
+      items: resultData,
+      count: result.haseach ? result.total : count
     })
   },
 
