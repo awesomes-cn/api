@@ -94,6 +94,29 @@ module.exports = {
     })
   },
 
+  // 获取最新
+  get_latest: async (req, res) => {
+    let limit = Math.min((req.query.limit || 10), 100)
+    let latestID = req.query.lid
+    let items = await MBlog.query({
+      limit: limit,
+      orderByRaw: 'id desc',
+      offset: 0
+    }).fetchAll()
+    if (items.at(0).id > latestID) {
+      let count = await MBlog.count('id')
+      res.send({
+        hasnew: true,
+        items: items,
+        count: count
+      })
+    } else {
+      res.send({
+        hasnew: false
+      })
+    }
+  },
+
   get_index_id: async (req, res) => {
     let item = await MBlog.query({where: {id: req.params.action}}).fetch({
       withRelated: [
