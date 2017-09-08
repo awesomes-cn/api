@@ -1,5 +1,70 @@
-let Link = require('../models/link')
-let Msg = require('../models/msg')
+const Link = require('../models/link')
+const Msg = require('../models/msg')
+const Release = require('../models/release')
+const Subject = require('../models/subject')
+const Mem = require('../models/mem')
+const Oper = require('../models/oper')
+const Cache = require('../lib/cache')
+
+let memUsing = async mids => {
+  return await Oper.where({typ: 'REPO', opertyp: 'USING'}).where('mem_id', 'in', mids).query({
+    select: ['idcd', 'mem_id']
+  }).fetchAll({
+    withRelated: [{
+      'repo': function (query) {
+        query.select('alia', 'cover', 'owner', 'id', 'using')
+      }
+    }]
+  })
+}
+
+let homeData = async () => {
+  // 发布
+  let releases = await Release.query({
+    orderByRaw: 'published_at desc',
+    limit: 5,
+    select: ['tag_name', 'repo_id', 'published_at']
+  }).fetchAll({
+    withRelated: [{
+      repo: query => {
+        query.select('id', 'name', 'cover', 'full_name', 'owner', 'alia')
+      }
+    }]
+  })
+
+  // 专题
+  let subs = await Subject.query({
+    limit: 4,
+    orderByRaw: '`order` desc',
+    select: ['title', 'key', 'cover']
+  }).fetchAll()
+
+  // 大牛在用
+  let mems = await Mem.where('reputation', '>=', 20).where('using', '>=', 5)
+  .query({
+    orderByRaw: 'reputation desc',
+    select: ['id', 'nc', 'avatar', 'using'],
+    limit: 4
+  }).fetchAll()
+  mems = mems.toJSON()
+  let mids = mems.map(mem => {
+    return mem.id
+  })
+
+  let usings = await memUsing(mids)
+  mems.forEach(mem => {
+    mem.usings = usings.filter(item => {
+      return item.get('mem_id') === mem.id
+    }).slice(0, 5).map(item => {
+      return item.related('repo')
+    })
+  })
+  return {
+    releases: releases,
+    subs: subs,
+    weuses: mems
+  }
+}
 
 module.exports = {
   // 获取友情链接
@@ -28,5 +93,12 @@ module.exports = {
     }).save()
 
     res.send({status: true})
+  },
+
+  // 首页数据
+  get_home: async (req, res) => {
+    let cacheKey = `home-info-data`
+    let data = await Cache.ensure(cacheKey, 60 * 60 * 12, homeData)
+    res.send(data)
   }
 }

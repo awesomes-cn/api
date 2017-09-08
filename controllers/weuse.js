@@ -1,7 +1,6 @@
 const Mem = require('../models/mem')
 const Oper = require('../models/oper')
 
-
 let memUsing = (mids) => {
   return Oper.where({typ: 'REPO', opertyp: 'USING'}).where('mem_id', 'in', mids).query({
     select: ['idcd', 'mem_id']
@@ -13,7 +12,6 @@ let memUsing = (mids) => {
     }]
   })
 }
-
 
 module.exports = {
   get_index: (req, res) => {
