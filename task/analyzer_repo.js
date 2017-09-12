@@ -1,9 +1,18 @@
-const LibRepo = require('../lib/repo')
+const analyzer = require('../analyzer/index')
+const Repo = require('../models/repo')
 
-// 计算 Quality
-let quality = async (url) => {
-  let result = await LibRepo.fetch(url)
-  console.log(result)
+let action = async (repoID) => {
+  let _repo = await Repo.where('id', '>', repoID).fetch()
+  try {
+    let score = await analyzer(_repo.toJSON())
+    _repo.set('score', score)
+    await _repo.save()
+  } catch (ex) {
+    console.log(' [x] 分析失败')
+  }
+  setTimeout(() => {
+    action(_repo.id)
+  }, 3000)
 }
 
-quality('vuejs/vue-loader')
+action(0)
