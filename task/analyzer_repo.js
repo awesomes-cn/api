@@ -12,7 +12,7 @@ let action = async (repoID) => {
   if ((_repo.id - day) % 2 === 0) {
     try {
       let score = await analyzer(_repo.toJSON())
-      _repo.set('score', score)
+      _repo.set('score', score * 100)
       await _repo.save()
     } catch (ex) {
       console.log(' [x] 分析失败')
