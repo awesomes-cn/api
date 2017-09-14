@@ -27,6 +27,7 @@
     "phantom": "^4.0.4",
     "redis": "^2.7.1",
     "request": "^2.81.0",
+    "rss": "^1.2.2",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

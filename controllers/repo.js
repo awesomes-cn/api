@@ -54,11 +54,12 @@ module.exports = {
     let query = {
       limit: limit,
       offset: skip,
-      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'using', 'mark', 'pushed_at']
+      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'using', 'mark', 'pushed_at', 'score']
     }
 
     query.orderByRaw = {
       'hot': '(stargazers_count + forks_count + subscribers_count) desc',
+      'score': 'score desc',
       'new': 'github_created_at desc',
       'trend': 'trend desc'
     }[req.query.sort || 'hot'] || '(stargazers_count + forks_count + subscribers_count) desc'
