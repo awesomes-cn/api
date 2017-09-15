@@ -1,5 +1,6 @@
 var RSS = require('rss')
 const Repo = require('../models/repo')
+const Subscribe = require('../models/subscribe')
 // const moment = require('moment')
 
 module.exports = {
@@ -36,5 +37,15 @@ module.exports = {
     var xml = feed.xml()
     res.set('Content-Type', 'text/xml')
     res.send(xml)
+  },
+  post_index: async (req, res) => {
+    let _email = req.body.email
+    let item = await Subscribe.where({email: _email}).fetch()
+    if (!item) {
+      await Subscribe.forge({
+        email: _email
+      }).save()
+    }
+    res.send({status: true})
   }
 }
