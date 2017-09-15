@@ -1,73 +1,31 @@
 var RSS = require('rss')
-
+const Repo = require('../models/repo')
+const moment = require('moment')
 module.exports = {
-  get_index: (req, res) => {
-    /* lets create an rss feed */
+  get_index: async (req, res) => {
+    let startDay = moment().add(-7, 'days').format()
+    let repos = await Repo.where('created_at', '>=', startDay).fetchAll()
+
     var feed = new RSS({
-      title: 'title',
-      description: 'description',
-      feed_url: 'http://example.com/rss.xml',
-      site_url: 'http://example.com',
-      image_url: 'http://example.com/icon.png',
-      docs: 'http://example.com/rss/docs.html',
-      managingEditor: 'Dylan Greene',
-      webMaster: 'Dylan Greene',
-      copyright: '2013 Dylan Greene',
-      language: 'en',
-      categories: ['Category 1','Category 2','Category 3'],
-      pubDate: 'May 20, 2012 04:00:00 GMT',
-      ttl: '60',
-      custom_namespaces: {
-        'itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd'
-      },
-      custom_elements: [
-        {'itunes:subtitle': 'A show about everything'},
-        {'itunes:author': 'John Doe'},
-        {'itunes:summary': 'All About Everything is a show about everything. Each week we dive into any subject known to man and talk about it as much as we can. Look for our podcast in the Podcasts app or in the iTunes Store'},
-        {'itunes:owner': [
-          {'itunes:name': 'John Doe'},
-          {'itunes:email': 'john.doe@example.com'}
-        ]},
-        {'itunes:image': {
-          _attr: {
-            href: 'http://example.com/podcasts/everything/AllAboutEverything.jpg'
-          }
-        }},
-        {'itunes:category': [
-          {_attr: {
-            text: 'Technology'
-          }},
-          {'itunes:category': {
-            _attr: {
-              text: 'Gadgets'
-            }
-          }}
-        ]}
-      ]
+      title: 'Awesomes-前端资源库',
+      description: '免费开源的高质量前端库、框架和插件',
+      feed_url: 'https://www.awesomes.cn/rss',
+      site_url: 'https://www.awesomes.cn/',
+      webMaster: 'hxh',
+      copyright: 'Copyright © 2016-2020 Awesomes.cn 1.0.0.',
+      language: 'zh-cn',
+      categories: ['前端库', '前端情报']
     })
 
-    /* loop over data and add to feed */
-    feed.item({
-      title:  'item title',
-      description: 'use this for the content. It can include html.',
-      url: 'http://example.com/article4?this&that', // link to the item
-      guid: '1123', // optional - defaults to url
-      categories: ['Category 1','Category 2','Category 3','Category 4'], // optional - array of item categories
-      author: 'Guest Author', // optional - defaults to feed author property
-      date: 'May 27, 2012', // any format that js Date can parse.
-      lat: 33.417974, //optional latitude field for GeoRSS
-      long: -111.933231, //optional longitude field for GeoRSS
-      // enclosure: {url:'...', file:'path-to-file'}, // optional enclosure
-      custom_elements: [
-        {'itunes:author': 'John Doe'},
-        {'itunes:subtitle': 'A short primer on table spices'},
-        {'itunes:image': {
-          _attr: {
-            href: 'http://example.com/podcasts/everything/AllAboutEverything/Episode1.jpg'
-          }
-        }},
-        {'itunes:duration': '7:04'}
-      ]
+    repos.forEach(item => {
+      feed.item({
+        title: item.get('name'),
+        description: item.get('description_cn') || item.get('description'),
+        categories: [`${item.get('rootyp_zh')}, ${item.get('typcd_zh')}`],
+        url: `https://www.awesomes.cn/repo/${item.get('owner')}/${item.get('alia')}`,
+        author: item.get('owner'),
+        date: item.get('github_created_at')
+      })
     })
 
     // cache the xml to send to clients
