@@ -10,7 +10,11 @@ let monthsAgo = DF.addMonths((new Date), -3)
 var amount = 3
 
 // 是否满足条件
-let isAllow = async repoData => {
+let isAllow = async (repoData, submit) => {
+  if (submit.from === 'trend') {
+    return true
+  }
+
   // start 数 > 10000
   let cond1 = repoData.stargazers_count >= 1000
   if (!cond1) { return false }
@@ -38,7 +42,7 @@ let fetchRepo = async id => {
   if (!_submit) { return }
   console.log('====', _submit.reponame())
   let repoData = await RepoHelper.fetch(_submit.reponame())
-  let _isAllow = await isAllow(repoData)
+  let _isAllow = await isAllow(repoData, _submit)
   if (_isAllow) {
     let result = await SubmitHelper.fetch(_submit.id, repoData, true)
     if (result) {
