@@ -1,10 +1,14 @@
 var RSS = require('rss')
 const Repo = require('../models/repo')
-const moment = require('moment')
+// const moment = require('moment')
+
 module.exports = {
   get_index: async (req, res) => {
-    let startDay = moment().add(-7, 'days').format()
-    let repos = await Repo.where('created_at', '>=', startDay).fetchAll()
+    // let startDay = moment().add(-7, 'days').format()
+    let repos = await Repo.query({
+      orderByRaw: 'id desc',
+      limit: 10
+    }).fetchAll()
 
     var feed = new RSS({
       title: 'Awesomes-前端资源库',
