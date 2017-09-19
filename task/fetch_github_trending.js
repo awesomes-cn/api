@@ -58,7 +58,7 @@ let fetchGithubTrend = async language => {
 
 let action = async () => {
   await fetchGithubTrend('css')
-  await fetchGithubTrend('html')
+  await fetchGithubTrend('vue')
   await fetchGithubTrend('javascript')
 }
 

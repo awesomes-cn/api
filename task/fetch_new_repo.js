@@ -11,7 +11,7 @@ var amount = 3
 
 // 是否满足条件
 let isAllow = async (repoData, submit) => {
-  if (submit.from === 'trend') {
+  if (submit.get('from') === 'trend') {
     return true
   }
 
