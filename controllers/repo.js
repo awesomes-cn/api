@@ -202,5 +202,27 @@ module.exports = {
         }
       }]
     }))
+  },
+
+  // 动态
+  get_actions: async (req, res) => {
+    let items = await Oper.where({
+      typ: 'REPO'
+    }).query({
+      limit: 5,
+      orderByRaw: 'id desc'
+    }).fetchAll({
+      withRelated: [
+        {
+          'repo': function (query) {
+            query.select('id', 'name', 'cover', 'owner', 'alia')
+          },
+          'mem': function (query) {
+            query.select('id', 'nc', 'avatar')
+          }
+        }
+      ]
+    })
+    res.send(items)
   }
 }

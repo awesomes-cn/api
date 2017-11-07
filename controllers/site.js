@@ -98,7 +98,7 @@ module.exports = {
   // 首页数据
   get_home: async (req, res) => {
     let cacheKey = `home-info-data`
-    let data = await Cache.ensure(cacheKey, 60 * 60 * 12, homeData)
+    let data = await Cache.ensure(cacheKey, 60 * 60, homeData)
     res.send(data)
   }
 }
