@@ -44,7 +44,7 @@ let homeData = async () => {
   .query({
     orderByRaw: 'reputation desc',
     select: ['id', 'nc', 'avatar', 'using'],
-    limit: 4
+    limit: 10
   }).fetchAll()
   mems = mems.toJSON()
   let mids = mems.map(mem => {
@@ -98,7 +98,7 @@ module.exports = {
   // 首页数据
   get_home: async (req, res) => {
     let cacheKey = `home-info-data`
-    let data = await Cache.ensure(cacheKey, 60 * 60, homeData)
+    let data = await Cache.ensure(cacheKey, 60 * 60 * 12, homeData)
     res.send(data)
   }
 }
