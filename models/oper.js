@@ -1,16 +1,17 @@
 const DB = require('../lib/db')
 const Repo = require('./repo')
 const Mem = require('./mem')
+require('./mem')
 const Msg = require('./msg')
 
-let Oper = DB.Model.extend({
+let Oper = DB.model('Oper', {
   tableName: 'opers',
   hasTimestamps: true,
   repo: function () {
     return this.belongsTo(Repo, 'idcd')
   },
   mem: function () {
-    return this.belongsTo(Mem)
+    return this.belongsTo('Mem')
   },
   initialize: function () {
     this.on('created', (model) => {

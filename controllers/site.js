@@ -3,19 +3,31 @@ const Msg = require('../models/msg')
 const Release = require('../models/release')
 const Subject = require('../models/subject')
 const Mem = require('../models/mem')
-const Oper = require('../models/oper')
 const Cache = require('../lib/cache')
 
-let memUsing = async mids => {
-  return await Oper.where({typ: 'REPO', opertyp: 'USING'}).where('mem_id', 'in', mids).query({
-    select: ['idcd', 'mem_id']
+let memUsing = async () => {
+  let random = parseInt(Math.random() * 10)
+  let mems = await Mem.where('reputation', '>=', 20).where('using', '>=', 5)
+  .query({
+    orderByRaw: 'reputation desc',
+    select: ['id', 'nc', 'avatar', 'using'],
+    limit: 4,
+    offset: random
   }).fetchAll({
-    withRelated: [{
-      'repo': function (query) {
-        query.select('alia', 'cover', 'owner', 'id', 'using')
+    withRelated: [
+      {
+        'opers': query => {
+          query.where({typ: 'REPO', opertyp: 'USING'}).select('id', 'mem_id', 'idcd')
+        }
+      },
+      {
+        'opers.repo': function (query) {
+          query.select('alia', 'cover', 'owner', 'id', 'using')
+        }
       }
-    }]
+    ]
   })
+  return mems
 }
 
 let homeData = async () => {
@@ -38,31 +50,10 @@ let homeData = async () => {
     orderByRaw: '`order` desc',
     select: ['title', 'key', 'cover']
   }).fetchAll()
-
-  // 大牛在用
-  let mems = await Mem.where('reputation', '>=', 20).where('using', '>=', 5)
-  .query({
-    orderByRaw: 'reputation desc',
-    select: ['id', 'nc', 'avatar', 'using'],
-    limit: 10
-  }).fetchAll()
-  mems = mems.toJSON()
-  let mids = mems.map(mem => {
-    return mem.id
-  })
-
-  let usings = await memUsing(mids)
-  mems.forEach(mem => {
-    mem.usings = usings.filter(item => {
-      return item.get('mem_id') === mem.id
-    }).slice(0, 5).map(item => {
-      return item.related('repo')
-    })
-  })
   return {
     releases: releases,
-    subs: subs,
-    weuses: mems
+    subs: subs
+    // weuses: mems
   }
 }
 
@@ -97,8 +88,14 @@ module.exports = {
 
   // 首页数据
   get_home: async (req, res) => {
-    let cacheKey = `home-info-data`
-    let data = await Cache.ensure(cacheKey, 60 * 60 * 12, homeData)
+    let data = await Cache.ensure(`home-index-data`, 60 * 60 * 12, homeData)
+    data.weuses = await Cache.ensure(`home-index-weuses`, 60 * 60, memUsing)
     res.send(data)
+  },
+
+  // 大牛在用
+  get_using: async (req, res) => {
+    let itms = await memUsing()
+    res.send(itms)
   }
 }
