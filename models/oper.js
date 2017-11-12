@@ -68,19 +68,16 @@ let Oper = DB.model('Oper', {
       })
     })
   },
-  maxOrder: function (params) {
+  maxOrder: async function (params) {
     if (params.opertyp !== 'USING') {
       return Promise.resolve(0)
     }
-    return new Promise(resolve => {
-      Oper.query({
-        where: params,
-        limit: 1,
-        orderByRaw: '`order` desc'
-      }).fetch().then(item => {
-        resolve(item.get('order'))
-      })
-    })
+    let item = await Oper.query({
+      where: params,
+      limit: 1,
+      orderByRaw: '`order` desc'
+    }).fetch()
+    return item ? item.get('order') : 0
   },
   // 给目标发送通知
   sendNotify: async function (model) {

@@ -28,11 +28,12 @@ module.exports = {
       Oper.query({
         where: where,
         limit: limit,
-        offset: skip
+        offset: skip,
+        orderByRaw: 'created_at desc'
       }).fetchAll({
         withRelated: [{
           'repo': function (query) {
-            query.select('alia', 'cover', 'owner', 'id', 'using', 'stargazers_count', 'description_cn', 'rootyp', 'rootyp_zh', 'typcd', 'typcd_zh', 'mark')
+            query.select('alia', 'cover', 'owner', 'id', 'using', 'stargazers_count', 'description_cn', 'description', 'rootyp', 'rootyp_zh', 'typcd', 'typcd_zh', 'mark')
           }
         }]
       })
