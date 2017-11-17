@@ -23,7 +23,7 @@ let Oper = DB.model('Oper', {
     return Oper.query({where: params}).count('id')
   },
   // 更新目标对象的操作次数
-  updateTarget: function (model) {
+  updateTarget: async function (model) {
     let Model = {
       REPO: {
         table: Repo,
@@ -53,20 +53,17 @@ let Oper = DB.model('Oper', {
       TOPIC: require('./topic')
     }[model.get('typ')]
 
-    if (!Model) { return Promise.resolve() }
+    if (!Model) { return 0 }
     let opername = Model.opers[model.get('opertyp')]
-    if (!opername) { return Promise.resolve() }
+    if (!opername) { return 0 }
     let table = Model.table
-    return new Promise(resolve => {
-      Oper.query({where: {opertyp: model.get('opertyp'), typ: model.get('typ'), idcd: model.get('idcd')}}).count().then(count => {
-        table.query({where: {id: model.get('idcd')}}).fetch().then(data => {
-          data.set(opername, count)
-          data.save().then(() => {
-            resolve(count)
-          })
-        })
-      })
-    })
+
+    let count = await Oper.query({where: {opertyp: model.get('opertyp'), typ: model.get('typ'), idcd: model.get('idcd')}}).count()
+    let _data = await table.query({where: {id: model.get('idcd')}}).fetch()
+    if (!_data) { return 0 }
+    _data.set(opername, count)
+    await _data.save()
+    return count
   },
   maxOrder: async function (params) {
     if (params.opertyp !== 'USING') {

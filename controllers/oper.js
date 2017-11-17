@@ -66,12 +66,27 @@ module.exports = {
       res.send({has: false, amount: amount})
       return
     }
+
     if (req.body.opertyp === 'USING') {
       let maxOrder = await Oper.maxOrder({opertyp: 'USING', mem_id: memId})
       params.order = maxOrder + 10000
     }
     await new Oper(params).save()
-    let amount = await Oper.sameAmount(pwoutsesion)
+    let amount = await Oper.updateTarget(new Oper(pwoutsesion))
+
+    if (req.body.opertyp === 'USING') {
+      // 更新会员在用的数量
+      let _amount = await Oper.where({
+        opertyp: 'USING',
+        typ: 'REPO',
+        mem_id: memId
+      }).count('id')
+      await Mem.forge({
+        id: res.locals.mid,
+        using: _amount
+      }).save()
+    }
+
     res.send({has: true, amount: amount})
   },
   get_ids: async (req, res) => {
