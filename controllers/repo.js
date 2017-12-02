@@ -224,5 +224,27 @@ module.exports = {
       ]
     })
     res.send(items)
+  },
+
+  // 相关推荐
+  get_related: async (req, res) => {
+    let _repo = await Repo.query({where: { owner: req.params.owner, alia: req.params.alia }}).fetch()
+    let _where = {
+      typcd: _repo.get('typcd'),
+      rootyp: _repo.get('rootyp')
+    }
+    let _order = [
+      'score desc',
+      'stargazers_count desc',
+      'trend desc',
+      '`using` desc',
+      'mark desc'
+    ][parseInt(Math.random() * 5)]
+    let items = await Repo.where(_where).where('id', '!=', _repo.id).query({
+      orderByRaw: _order,
+      limit: 4,
+      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner']
+    }).fetchAll()
+    res.send(items)
   }
 }

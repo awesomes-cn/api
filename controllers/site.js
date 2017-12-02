@@ -3,6 +3,7 @@ const Msg = require('../models/msg')
 const Release = require('../models/release')
 const Subject = require('../models/subject')
 const Mem = require('../models/mem')
+const Site = require('../models/site')
 const Cache = require('../lib/cache')
 
 let memUsing = async () => {
@@ -50,9 +51,18 @@ let homeData = async () => {
     orderByRaw: '`order` desc',
     select: ['title', 'key', 'cover']
   }).fetchAll()
+
+  // 统计
+  let _statistic = await Site.where({
+    typ: 'statistic'
+  }).fetch()
+
+  let statistic = JSON.parse(_statistic ? _statistic.get('sdesc') : "{}")
+
   return {
     releases: releases,
-    subs: subs
+    subs: subs,
+    statistic: statistic
     // weuses: mems
   }
 }
@@ -88,7 +98,8 @@ module.exports = {
 
   // 首页数据
   get_home: async (req, res) => {
-    let data = await Cache.ensure(`home-index-data`, 60 * 60 * 12, homeData)
+    let data = await Cache.ensure(`home-index-data-all`, 60 * 60 * 12, homeData)
+    // let data = await homeData()
     data.weuses = await Cache.ensure(`home-index-weuses`, 60 * 60, memUsing)
     res.send(data)
   },
