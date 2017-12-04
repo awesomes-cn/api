@@ -2,6 +2,7 @@
 const Site = require('../models/site')
 const Repo = require('../models/repo')
 const Oper = require('../models/oper')
+const Mem = require('../models/mem')
 
 let compute = async () => {
   let item = await Site.where({typ: 'statistic'}).fetch()
@@ -12,13 +13,8 @@ let compute = async () => {
   // repo 总数
   let _repos = await Repo.count('id')
 
-  // 收藏用户数
-  let _mems = await Oper.where({
-    typ: 'REPO',
-    opertyp: 'MARK'
-  }).query({
-    groupBy: 'mem_id'
-  }).count('id')
+  // 用户数
+  let _mems = await Mem.count('id')
 
   // 收藏repo数
   let _marks = await Oper.where({
