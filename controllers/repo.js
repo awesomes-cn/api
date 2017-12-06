@@ -243,7 +243,7 @@ module.exports = {
     let items = await Repo.where(_where).where('id', '!=', _repo.id).query({
       orderByRaw: _order,
       limit: 4,
-      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner']
+      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia']
     }).fetchAll()
     res.send(items)
   }
