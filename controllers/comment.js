@@ -28,6 +28,7 @@ module.exports = {
     let limit = Math.min((req.query.limit || 30), 100)
     let skip = parseInt(req.query.skip || 0)
     let where = {}
+    let order = req.query.order
     ;['typ', 'idcd', 'mem_id'].forEach(key => {
       let val = req.query[key]
       if (val) {
@@ -37,7 +38,8 @@ module.exports = {
     let query = {
       where: where,
       limit: limit,
-      offset: skip
+      offset: skip,
+      orderByRaw: order || 'id asc'
     }
 
     let [comments, count, myfavors] = await Promise.all([
