@@ -13,6 +13,19 @@ let isMyFeex = async (res, fid) => {
 }
 
 module.exports = {
+  get_index: async (req, res) => {
+    let items = await Feex.fetchAll({
+      withRelated: [{
+        mem: query => {
+          query.select('id', 'nc', 'avatar')
+        }
+      }]
+    })
+    res.send({
+      items: items
+    })
+  },
+
   get_index_id: async (req, res) => {
     let item = await Feex.where({
       id: req.params.action
@@ -21,6 +34,7 @@ module.exports = {
     })
     res.send(item)
   },
+  
 
   get_catalog: async (req, res) => {
     let items = await FeexCatalog.where({
