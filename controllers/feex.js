@@ -27,11 +27,20 @@ module.exports = {
   },
 
   get_index_id: async (req, res) => {
+    let _related = {}
+   if (req.query.relation) {
+    _related = {
+      withRelated: ['catalogs', {
+        mem: query => {
+          query.select('id', 'nc', 'avatar')
+        }
+      }]
+    }
+   }
+
     let item = await Feex.where({
       id: req.params.action
-    }).fetch({
-      withRelated: ['catalogs']
-    })
+    }).fetch(_related)
     res.send(item)
   },
   
