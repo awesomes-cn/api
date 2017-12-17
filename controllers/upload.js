@@ -4,10 +4,10 @@ const path = require('path')
 module.exports = {
   // 上传
   post_index: (req, res) => {
-    if (!res.locals.mid) {
-      res.send({status: false})
-      return
-    }
+    // if (!res.locals.mid) {
+    //   res.send({status: false})
+    //   return
+    // }
     let bodydata = {}
     if (req.busboy) {
       req.busboy.on('field', function (key, value, keyTruncated, valueTruncated) {

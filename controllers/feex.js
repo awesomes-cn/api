@@ -4,6 +4,7 @@ const FeexStructure = require('../models/feex_structure')
 
 // 权限
 let isMyFeex = async (res, fid) => {
+  return true
   let memId = res.locals.mid
   let _feex = await Feex.where({
     id: fid
@@ -14,7 +15,12 @@ let isMyFeex = async (res, fid) => {
 
 module.exports = {
   get_index: async (req, res) => {
-    let items = await Feex.fetchAll({
+    let items = await Feex.query({
+      orderByRaw: 'created_at desc',
+      where: {
+        ison: 'Y'
+      }
+    }).fetchAll({
       withRelated: [{
         mem: query => {
           query.select('id', 'nc', 'avatar')
@@ -43,8 +49,49 @@ module.exports = {
     }).fetch(_related)
     res.send(item)
   },
-  
 
+  put_index: async (req, res) => {
+    let _feex = await Feex.where({
+      id: req.body.id
+    }).fetch()
+
+    if (!await isMyFeex(res, _feex.id)) {
+      res.sendStatus(401)
+      res.send({status: false})
+      return
+    }
+
+    ;['title', 'price', 'summary', 'cover'].forEach(key => {
+      _feex.set(key, req.body[key])
+    })
+
+    await _feex.save()
+    res.send({
+      status: true
+    })
+  },
+
+  post_index: async (req, res) => {
+    // if (!await isMyFeex(res, _feex.id)) {
+    //   res.sendStatus(401)
+    //   res.send({status: false})
+    //   return
+    // }
+    let _feex = Feex.forge({
+      mem_id: 1
+    })
+
+    ;['title', 'price', 'summary', 'cover'].forEach(key => {
+      _feex.set(key, req.body[key])
+    })
+
+    _feex = await _feex.save()
+    res.send({
+      status: true,
+      item: _feex
+    })
+  },
+  
   get_catalog: async (req, res) => {
     let items = await FeexCatalog.where({
       feex_id: req.params.id
