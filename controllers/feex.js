@@ -1,6 +1,10 @@
 const Feex = require('../models/feex')
 const FeexCatalog = require('../models/feex_catalog')
 const FeexStructure = require('../models/feex_structure')
+const path = require('path')
+const aliyun = require('../lib/aliyun')
+const HelperFeexRSP = require('../helper/feex/reset_structure_path')
+const localEnv = require('../config')
 
 // 权限
 let isMyFeex = async (res, fid) => {
@@ -12,6 +16,12 @@ let isMyFeex = async (res, fid) => {
   if (!_feex) { return false }
   return _feex.mem_id === memId
 }
+
+// 上传某个文件的内容到阿里云上
+// let uploadFileConToAliyun = async (feex) => {
+//   let filename = `feex/${feex.id}${path.extname(feex.get('name'))}`
+//   await aliyun.uploadTxt(feex.get('file_con'), filename)
+// }
 
 module.exports = {
   get_index: async (req, res) => {
@@ -212,6 +222,35 @@ module.exports = {
     })
   },
 
+  get_structure_raw_con: async (req, res) => {
+    let st = await FeexStructure.where({
+      id: req.query.id
+    }).fetch()
+    let exta = (path.extname(st.get('name')) || '').toLocaleLowerCase()
+    let ctype = {
+      '.css': 'text/css',
+      '.js': 'application/x-javascript'
+    }[exta] || ''
+    res.set('Content-Type', ctype)
+    res.send(st.get('file_con'))
+  },
+
+  // 获取某个文件真实的连接地址
+  get_structure_link: async (req, res) => {
+    let st = await FeexStructure.where({
+      path: req.query.path
+    }).fetch()
+    if (!st) {
+      res.send('')
+      return
+    }
+    if (st.get('file_from') === 'file') {
+      res.send(`${localEnv.server.url}feex/structure_raw_con?id=${st.id}`)
+    } else {
+      res.send('/feex/structure_link?name=css/main.css')
+    }
+  },
+
   post_structure: async (req, res) => {
     if (!isMyFeex(res, req.params.id)) {
       res.sendStatus(401)
@@ -227,6 +266,8 @@ module.exports = {
       }
     })
     let resitem = await FeexStructure.forge(item).save()
+    // await uploadFileConToAliyun(resitem)
+    await HelperFeexRSP(resitem.toJSON())
     res.send({
       status: true,
       item: resitem
@@ -251,12 +292,21 @@ module.exports = {
     }
 
     let item = {}
-    ;['id', 'name', 'file_from', 'file_upload', 'feex_file_id', 'parent'].forEach(key => {
+    ;['id', 'name', 'file_from', 'file_upload', 'feex_file_id', 'parent', 'file_con'].forEach(key => {
       if (req.body[key] !== undefined) {
         item[key] = req.body[key]
       }
     })
     let resitem = await FeexStructure.forge(item).save()
+    // await uploadFileConToAliyun(await FeexStructure.where({
+    //   id: req.body.id
+    // }).fetch())
+    if (req.body.name !== undefined) {
+      await HelperFeexRSP((await FeexStructure.where({
+        id: req.body.id
+      }).fetch()).toJSON())
+    }
+
     res.send({
       status: true,
       item: resitem
