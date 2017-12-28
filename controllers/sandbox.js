@@ -17,7 +17,7 @@ let script = (domain) => {
 
 module.exports = {
   get_feex: (req, res) => {
-    let domain = req.hostname.replace(/^\w+\./, '')
+    let domain = req.hostname.replace(/^[a-zA-Z]+\./, '')
     res.set('Content-Type', 'text/html')
     res.send(`
     <!doctype html>
