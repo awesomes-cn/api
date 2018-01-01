@@ -206,7 +206,7 @@ module.exports = {
     let items = await FeexStructure.where({
       feex_id: req.params.id
     }).query({
-      select: ['id', 'feex_id', 'name', 'type', 'file_from', 'parent']
+      select: ['id', 'feex_id', 'name', 'type', 'file_from', 'parent', 'file_upload']
     }).fetchAll()
     res.send({
       items: items
