@@ -40,6 +40,10 @@ module.exports = {
     }
     if (st.get('file_from') === 'file') {
       let exta = (path.extname(st.get('name')) || '').toLocaleLowerCase()
+      if (exta === '.html') {
+        res.send('you are lost')
+        return
+      }
       let ctype = {
         '.css': 'text/css',
         '.js': 'application/x-javascript'

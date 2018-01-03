@@ -1,20 +1,30 @@
 const Feex = require('../models/feex')
 const FeexCatalog = require('../models/feex_catalog')
 const FeexStructure = require('../models/feex_structure')
-const path = require('path')
-const aliyun = require('../lib/aliyun')
 const HelperFeexRSP = require('../helper/feex/reset_structure_path')
-const localEnv = require('../config')
+const FeexSaleLog = require('../models/feex_sale_log')
 
 // 权限
 let isMyFeex = async (res, fid) => {
-  return true
   let memId = res.locals.mid
   let _feex = await Feex.where({
     id: fid
   }).fetch()
-  if (!_feex) { return false }
-  return _feex.mem_id === memId
+  if (!_feex || !memId) { return false }
+  return _feex.get('mem_id') === memId
+}
+
+let hasBuy = async (res, fid) => {
+  // 试学
+  let memId = res.locals.mid
+  if (!memId) {
+    return false
+  }
+  let _log = await FeexSaleLog.where({
+    mem_id: memId,
+    feex_id: fid
+  }).fetch()
+  return _log ? true : false
 }
 
 module.exports = {
@@ -106,7 +116,7 @@ module.exports = {
   },
 
   post_catalog: async (req, res) => {
-    if (!isMyFeex(res, req.params.id)) {
+    if (!await isMyFeex(res, req.params.id)) {
       res.sendStatus(401)
       res.send({status: false})
       return
@@ -136,6 +146,11 @@ module.exports = {
   },
 
   get_structure: async (req, res) => {
+    if (!(await isMyFeex(res, req.params.id) || await hasBuy(res, req.params.id))) {
+      res.sendStatus(401)
+      res.send({status: false})
+      return
+    }
     let items = await FeexStructure.where({
       feex_id: req.params.id
     }).query({
