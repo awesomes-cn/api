@@ -246,5 +246,17 @@ module.exports = {
       select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia']
     }).fetchAll()
     res.send(items)
+  },
+
+  // 随机推荐一个
+  get_random: async (req, res) => {
+    let _cacheData = await Cache.get('recommendRepos')
+    _cacheData = JSON.parse(_cacheData)
+    let _index = parseInt(Math.random() * _cacheData.count)
+    let _random = _cacheData.items[_index]
+    let _item = await Repo.where({id: _random}).query({
+      select: ['id', 'name', 'cover', 'owner', 'alia', 'description_cn', 'description', 'stargazers_count', 'forks_count', 'using', 'pushed_at']
+    }).fetch()
+    res.send(_item)
   }
 }
