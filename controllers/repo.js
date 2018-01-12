@@ -255,7 +255,7 @@ module.exports = {
     let _index = parseInt(Math.random() * _cacheData.count)
     let _random = _cacheData.items[_index]
     let _item = await Repo.where({id: _random}).query({
-      select: ['id', 'name', 'cover', 'owner', 'alia', 'description_cn', 'description', 'stargazers_count', 'forks_count', 'using', 'pushed_at']
+      select: ['id', 'name', 'score', 'cover', 'owner', 'alia', 'description_cn', 'description', 'stargazers_count', 'forks_count', 'using', 'pushed_at']
     }).fetch()
     res.send(_item)
   }
