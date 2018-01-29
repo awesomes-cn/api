@@ -1,5 +1,7 @@
 const FeexCatalog = require('../models/feex_catalog')
 const Feex = require('../models/feex')
+const FeexStructure = require('../models/feex_structure')
+const FeexSaleLog = require('../models/feex_sale_log')
 
 // 权限
 let isMyFeex = async (res, fid) => {
@@ -9,6 +11,19 @@ let isMyFeex = async (res, fid) => {
   }).fetch()
   if (!_feex || !memId) { return false }
   return _feex.get('mem_id') === memId
+}
+
+let hasBuy = async (res, fid) => {
+  // 试学
+  let memId = res.locals.mid
+  if (!memId) {
+    return false
+  }
+  let _log = await FeexSaleLog.where({
+    mem_id: memId,
+    feex_id: fid
+  }).fetch()
+  return _log ? true : false
 }
 
 module.exports = {
@@ -33,6 +48,22 @@ module.exports = {
     res.send({
       status: true
     })
+  },
+
+  get_structure: async (req, res) => {
+    let _cata = await FeexCatalog.where({
+      id: req.params.id
+    }).fetch()
+
+    let item = await FeexStructure.where({
+      id: _cata.get('feex_structure_id')
+    }).fetch()
+    if (!(_cata.get('isfree') === 'Y' || await isMyFeex(res, item.get('feex_id')) || await hasBuy(res, item.get('feex_id')))) {
+      res.sendStatus(401)
+      res.send({status: false})
+      return
+    }
+    res.send(item)
   },
 
   put_index_id: async (req, res) => {

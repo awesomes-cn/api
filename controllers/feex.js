@@ -29,11 +29,16 @@ let hasBuy = async (res, fid) => {
 
 module.exports = {
   get_index: async (req, res) => {
+    let _where = {
+      ison: 'Y'
+    }
+    let _author = req.params.author
+    if (_author) {
+      _where.mem_id = _author
+    }
     let items = await Feex.query({
       orderByRaw: 'created_at desc',
-      where: {
-        ison: 'Y'
-      }
+      where: _where
     }).fetchAll({
       withRelated: [{
         mem: query => {
@@ -92,7 +97,7 @@ module.exports = {
     //   return
     // }
     let _feex = Feex.forge({
-      mem_id: 1
+      mem_id: res.locals.mid
     })
 
     ;['title', 'price', 'summary', 'cover'].forEach(key => {
@@ -110,6 +115,12 @@ module.exports = {
     let items = await FeexCatalog.where({
       feex_id: req.params.id
     }).fetchAll()
+    items = items.toJSON()
+    let _hasBy = await hasBuy(res, req.params.id)
+    let _isMyFeex = await isMyFeex(res, req.params.id)
+    items.forEach(item => {
+      item.hasAccess = (item.isfree === 'Y' || _hasBy || _isMyFeex)
+    })
     res.send({
       items: items
     })
