@@ -53,16 +53,16 @@ let homeData = async () => {
   }).fetchAll()
 
   // 统计
-  let _statistic = await Site.where({
-    typ: 'statistic'
-  }).fetch()
+  // let _statistic = await Site.where({
+  //   typ: 'statistic'
+  // }).fetch()
 
-  let statistic = JSON.parse(_statistic ? _statistic.get('sdesc') : "{}")
+  // let statistic = JSON.parse(_statistic ? _statistic.get('sdesc') : "{}")
 
   return {
     releases: releases,
-    subs: subs,
-    statistic: statistic
+    subs: subs
+    // statistic: statistic
     // weuses: mems
   }
 }
