@@ -10,7 +10,7 @@ module.exports = {
     let pwd = crypto.createHash('md5').update(req.body.pwd).digest('hex')
     Mem.where({email: uid, pwd: pwd}).fetch().then(data => {
       if (data) {
-        let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '5h' })
+        let token = jwt.sign({ id: data.id }, Config.jwtkey, { expiresIn: '240h' })
         res.send({
           status: true,
           token: token,

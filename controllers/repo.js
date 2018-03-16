@@ -54,7 +54,7 @@ module.exports = {
     let query = {
       limit: limit,
       offset: skip,
-      select: ['id', 'name', 'cover', 'description_cn', 'description', 'owner', 'alia', 'using', 'mark', 'pushed_at', 'score']
+      select: ['id', 'name', 'cover', 'banner_cover', 'description_cn', 'description', 'owner', 'alia', 'using', 'mark', 'pushed_at', 'score']
     }
 
     query.orderByRaw = {
@@ -117,9 +117,10 @@ module.exports = {
   put_index_id: async (req, res) => {
     await Auth.isAdmin(req, res)
     let item = await Repo.query({where: {id: parseInt(req.params.action)}}).fetch()
-    ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'rootyp_zh', 'typcd', 'typcd_zh', 'tag', 'hidetags', 'recommend', 'cover'].forEach(key => {
+    ;['alia', 'html_url', 'description', 'description_cn', 'homepage', 'demo', 'rootyp', 'rootyp_zh', 'typcd', 'typcd_zh', 'tag', 'hidetags', 'recommend', 'cover', 'banner_cover'].forEach(key => {
       item.set(key, req.body[key])
     })
+    Cache.delete('home-index-data-all_all')
     await item.save()
     res.send({status: true})
   },

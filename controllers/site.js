@@ -3,7 +3,7 @@ const Msg = require('../models/msg')
 const Release = require('../models/release')
 const Subject = require('../models/subject')
 const Mem = require('../models/mem')
-const Site = require('../models/site')
+const Repo = require('../models/repo')
 const Cache = require('../lib/cache')
 
 let memUsing = async () => {
@@ -58,10 +58,17 @@ let homeData = async () => {
   // }).fetch()
 
   // let statistic = JSON.parse(_statistic ? _statistic.get('sdesc') : "{}")
+  // 推荐的
+  let recorepos = await Repo.where('recommend', '>', 0).query({
+    orderByRaw: 'recommend desc',
+    limit: 6,
+    select: ['banner_cover', 'cover', 'owner', 'alia', 'description_cn', 'description']
+  }).fetchAll()
 
   return {
     releases: releases,
-    subs: subs
+    subs: subs,
+    recorepos: recorepos
     // statistic: statistic
     // weuses: mems
   }
@@ -98,7 +105,7 @@ module.exports = {
 
   // 首页数据
   get_home: async (req, res) => {
-    let data = await Cache.ensure(`home-index-data-all`, 60 * 60 * 12, homeData)
+    let data = await Cache.ensure(`home-index-data-all_all`, 60 * 60 * 12, homeData)
     // let data = await homeData()
     data.weuses = await Cache.ensure(`home-index-weuses`, 60 * 60, memUsing)
     res.send(data)
