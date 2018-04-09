@@ -66,7 +66,7 @@ module.exports = {
       myQuery = MBlog.where('id', 'in', result.ids)
     }
 
-    let [count, newss, favors] = await Promise.all([
+    let [count, newss, favors, collects] = await Promise.all([
       MBlog.where(where).count('id'),
       myQuery.query(query).fetchAll({
         withRelated: [
@@ -80,12 +80,14 @@ module.exports = {
             }
           }]
       }),
-      Logic.fetchMyOpers(req, 'FAVOR', 'NEWS')
+      Logic.fetchMyOpers(req, 'FAVOR', 'NEWS'),
+      Logic.fetchMyOpers(req, 'COLLECT', 'NEWS')
     ])
 
     let resultData = newss.toJSON()
     resultData.forEach(item => {
       item.isFavor = favors.indexOf(item.id) > -1
+      item.isCollect = collects.indexOf(item.id) > -1
     })
 
     res.send({

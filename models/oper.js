@@ -1,6 +1,6 @@
 const DB = require('../lib/db')
 const Repo = require('./repo')
-const Mem = require('./mem')
+
 require('./mem')
 const Msg = require('./msg')
 
@@ -41,7 +41,8 @@ let Oper = DB.model('Oper', {
       NEWS: {
         table: require('./microblog'),
         opers: {
-          FAVOR: 'favor'
+          FAVOR: 'favor',
+          COLLECT: 'collect'
         }
       },
       DIANP: {
@@ -78,13 +79,15 @@ let Oper = DB.model('Oper', {
   },
   // 给目标发送通知
   sendNotify: async function (model) {
+    const Mem = require('./mem')
     let Model = {
       NEWS: {
         table: './microblog',
         name: '情报',
         link: 'news',
         opers: {
-          FAVOR: 'favor'
+          FAVOR: '赞',
+          COLLECT: '收藏'
         }
       }
     }[model.get('typ')]
@@ -95,21 +98,21 @@ let Oper = DB.model('Oper', {
       domain = 'news'
     }
     let table = require(Model.table)
-
     let [fromem, distobj] = await Promise.all([
-      Mem.query({where: {id: model.get('mem_id')}}).fetch(),
-      table.query({where: {id: model.get('idcd')}}).fetch()
+      Mem.where({id: model.get('mem_id')}).fetch(),
+      table.where({id: model.get('idcd')}).fetch()
     ])
 
     let toid = distobj.get('mem_id')
 
     // 目标用户发送通知，如果是给自己的对象则不用通知
     let distids = fromem.id === toid ? [] : [toid]
+    let _action = Model.opers[model.get('opertyp')]
     await distids.map(async (mem) => {
       await new Msg({
-        title: '赞',
+        title: _action,
         domain: domain,
-        con: `[${fromem.get('nc')}](/mem/${fromem.get('id')}) 赞了你的 [${Model.name}](/${Model.link}/${model.get('idcd')})`,
+        con: `[${fromem.get('nc')}](/mem/${fromem.get('id')}) ${_action}了你的 [${Model.name}](/${Model.link}/${model.get('idcd')})`,
         status: 'UNREAD',
         to: toid,
         typ: 'favor'
