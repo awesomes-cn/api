@@ -1,4 +1,5 @@
 const MBlog = require('../models/microblog')
+const Oper = require('../models/oper')
 const Logic = require('../lib/logic')
 const moment = require('moment')
 const phantom = require('phantom')
@@ -42,33 +43,52 @@ let searchGo = (key, hitsPerPage, page) => {
   })
 }
 
+let formatQuery = (wheres) => {
+  return wheres.reduce((result, item) => {
+    return result.where(...item)
+  }, MBlog)
+}
+
 module.exports = {
   get_index: async (req, res) => {
     let limit = Math.min((req.query.limit || 10), 100)
     let skip = parseInt(req.query.skip || 0)
-    let where = {}
-    if (req.query.mem > 0) {
-      where = {
-        mem_id: req.query.mem
-      }
+    let wheres = []
+
+    // 谁发布的
+    if (req.query.author > 0) {
+      wheres.push(['mem_id', '=', req.query.author])
     }
+
+    // 谁收藏的
+    let _collectby = req.query.collectby
+    if (_collectby > 0) {
+      let _opers = await Oper.where({
+        typ: 'NEWS',
+        opertyp: 'COLLECT',
+        mem_id: _collectby
+      }).fetchAll()
+      let _nids = _opers.toJSON().map(item => {
+        return item.idcd
+      })
+      wheres.push(['id', 'in', _nids])
+    }
+
     let query = {
       limit: limit,
       offset: skip,
-      orderByRaw: 'id desc',
-      where: where
+      orderByRaw: 'id desc'
     }
     let search = req.query.search
     let page = (skip / limit) + 1
     let result = await searchGo(search, limit, page - 1)
-    let myQuery = MBlog
+
     if (result.haseach) {
-      myQuery = MBlog.where('id', 'in', result.ids)
+      wheres.push(['id', 'in', result.ids])
     }
 
-    let [count, newss, favors, collects] = await Promise.all([
-      MBlog.where(where).count('id'),
-      myQuery.query(query).fetchAll({
+    let [newss, count, favors, collects] = await Promise.all([
+      formatQuery(wheres).query(query).fetchAll({
         withRelated: [
           {
             'mem': function (mqu) {
@@ -80,6 +100,7 @@ module.exports = {
             }
           }]
       }),
+      formatQuery(wheres).count('id'),
       Logic.fetchMyOpers(req, 'FAVOR', 'NEWS'),
       Logic.fetchMyOpers(req, 'COLLECT', 'NEWS')
     ])
