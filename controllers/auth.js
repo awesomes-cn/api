@@ -9,6 +9,7 @@ module.exports = {
   get_login: (req, res) => {
     res.redirect(`http://github.com/login/oauth/authorize?client_id=${config.github.client_id}&redirect_uri=${config.github.redirect_uri}&state=${parseInt(Math.random() * 10000)}`)
   },
+
   get_return: async (req, res) => {
     let webReturn = `https://www.awesomes.cn/auth?token=`
     let token = await new Promise(resolve => {
@@ -106,6 +107,7 @@ module.exports = {
     res.redirect(`${webReturn}${loginToken}`)
     return
   },
+
   post_session: async (req, res) => {
     let memID = await new Promise(resolve => {
       jwt.verify(req.body.token, config.jwtkey, (err, payload) => {
@@ -132,6 +134,49 @@ module.exports = {
       } else {
         res.send({status: false})
       }
+    })
+  },
+
+  post_wxsp: async (req, res) => {
+    let _code = req.body.code
+    let _info = req.body.info
+    let _url = `https://api.weixin.qq.com/sns/jscode2session?appid=${config.wxsp.appid}&secret=${config.wxsp.appsecret}&js_code=${_code}&grant_type=authorization_code`
+    request({
+      method: 'GET',
+      url: _url,
+      headers: {
+        'Accept': 'application/json'
+      }
+    }, async (error, response, body) => {
+      let _openid = JSON.parse(body).openid
+      let _mauth = await Mauth.where({
+        provider: 'wxsp',
+        uid: _openid
+      }).fetch()
+      if (!_mauth) {
+        // 注册
+        let newMem = await Mem.forge({
+          nc: _info.nickName,
+          avatar: _info.avatarUrl
+        }).save()
+
+        await MemInfo.forge({
+          mem_id: newMem.id,
+          location: `${_info.country} ${_info.city}`,
+          gender: _info.gender === 1 ? 'M' : 'F'
+        }).save()
+
+        _mauth = await Mauth.forge({
+          provider: 'wxsp',
+          uid: _openid,
+          mem_id: newMem.id
+        }).save()
+      }
+
+      let loginToken = jwt.sign({ id: _mauth.get('mem_id') }, config.jwtkey, { expiresIn: '24h' })
+      res.send({
+        token: loginToken
+      })
     })
   }
 }
