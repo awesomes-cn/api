@@ -4,6 +4,7 @@ const Mauth = require('../models/mauth')
 const Mem = require('../models/mem')
 const MemInfo = require('../models/mem_info')
 const jwt = require('jsonwebtoken')
+const expireday = '10 days'
 
 module.exports = {
   get_login: (req, res) => {
@@ -51,7 +52,7 @@ module.exports = {
     let loginToken
     // 登录
     if (_mauth) {
-      loginToken = jwt.sign({ id: _mauth.get('mem_id') }, config.jwtkey, { expiresIn: '5h' })
+      loginToken = jwt.sign({ id: _mauth.get('mem_id') }, config.jwtkey, { expiresIn: expireday })
       res.redirect(`${webReturn}${loginToken}`)
       return
     }
@@ -74,7 +75,7 @@ module.exports = {
         blog: memInfo.get('blog') || userInfo.blog,
         location: memInfo.get('blog') || userInfo.location
       })
-      loginToken = jwt.sign({ id: res.locals.mid }, config.jwtkey, { expiresIn: '5h' })
+      loginToken = jwt.sign({ id: res.locals.mid }, config.jwtkey, { expiresIn: expireday })
       res.redirect(`${webReturn}${loginToken}`)
       return
     }
@@ -103,7 +104,7 @@ module.exports = {
       mem_id: newMem.id
     }).save()
 
-    loginToken = jwt.sign({ id: newMem.id }, config.jwtkey, { expiresIn: '5h' })
+    loginToken = jwt.sign({ id: newMem.id }, config.jwtkey, { expiresIn: expireday })
     res.redirect(`${webReturn}${loginToken}`)
     return
   },
@@ -120,7 +121,7 @@ module.exports = {
     })
     Mem.where({id: memID}).fetch().then(data => {
       if (data) {
-        let token = jwt.sign({ id: data.id }, config.jwtkey, { expiresIn: '5h' })
+        let token = jwt.sign({ id: data.id }, config.jwtkey, { expiresIn: expireday })
         res.send({
           status: true,
           token: token,
@@ -173,7 +174,7 @@ module.exports = {
         }).save()
       }
 
-      let loginToken = jwt.sign({ id: _mauth.get('mem_id') }, config.jwtkey, { expiresIn: '24h' })
+      let loginToken = jwt.sign({ id: _mauth.get('mem_id') }, config.jwtkey, { expiresIn: expireday })
       res.send({
         token: loginToken
       })
