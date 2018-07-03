@@ -127,7 +127,7 @@ module.exports = {
 
   // 最新发布
   get_latest: (req, res) => {
-    Repo.query({limit: 12, offset: 0, orderByRaw: 'id desc', select: ['id', 'name', 'cover', 'description', 'description_cn', 'owner', 'alia', 'rootyp_zh', 'typcd_zh']}).fetchAll().then((repo) => {
+    Repo.query({limit: 12, offset: 0, orderByRaw: 'id desc', select: ['id', 'name', 'cover', 'description', 'description_cn', 'owner', 'alia', 'rootyp_zh', 'typcd_zh', 'rootyp', 'typcd']}).fetchAll().then((repo) => {
       res.send(repo)
     }).catch((err) => {
       console.error(err)
