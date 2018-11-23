@@ -64,6 +64,8 @@ let syncRepoTrend = id => {
       setTimeout(() => {
         syncRepoTrend(item.id)
       }, 500)
+    } else {
+      process.exit()
     }
   })
 }

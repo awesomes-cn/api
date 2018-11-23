@@ -15,6 +15,8 @@ let syncRepoTask = id => {
       setTimeout(() => {
         syncRepoTask(item.id)
       }, 1200)
+    } else {
+      process.exit()
     }
   })
 }

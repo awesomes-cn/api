@@ -4,6 +4,7 @@ const Repo = require('../models/repo')
 let action = async (repoID) => {
   let _repo = await Repo.where('id', '>', repoID).fetch()
   if (!_repo) {
+    process.exit()
     return
   }
 

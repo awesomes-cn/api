@@ -12,6 +12,7 @@ let clearJsons = async () => {
   })
   await Promise.all(actions)
   console.log(` [x]清除所有过期的 JSON 数据成功`)
+  process.exit()
 }
 
 clearJsons()

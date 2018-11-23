@@ -31,6 +31,7 @@ let compute = async () => {
   await item.save()
 
   console.log(` [x]更新统计数据成功`)
+  process.exit()
 }
 
 compute()

@@ -17,6 +17,7 @@ let searchIndex = async () => {
   })
   index.addObjects(objects, (err, content) => {
     console.log(err, content)
+    process.exit()
   })
 }
 

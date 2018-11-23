@@ -44,6 +44,7 @@ let fetchRepoReleases = async () => {
   for (let repo of _repos) {
     await fetchOne(repo)
   }
+  process.exit()
 }
 
 fetchRepoReleases()

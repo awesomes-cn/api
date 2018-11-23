@@ -33,6 +33,7 @@ let fetchAvatars = async () => {
   for (let mem of mems) {
     await fetchOne(mem)
   }
+  process.exit()
 }
 
 fetchAvatars()

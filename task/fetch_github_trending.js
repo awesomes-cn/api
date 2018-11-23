@@ -60,6 +60,7 @@ let action = async () => {
   await fetchGithubTrend('css')
   await fetchGithubTrend('vue')
   await fetchGithubTrend('javascript')
+  process.exit()
 }
 
 action()

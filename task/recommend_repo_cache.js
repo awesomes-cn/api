@@ -18,6 +18,7 @@ let fetch = async () => {
   console.log('要缓存的数据条数', _ids.length)
   Cache.set('recommendRepos', _data, 60 * 60 * 24)
   console.log('ok')
+  process.exit()
 }
 
 fetch()
