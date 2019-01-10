@@ -11,5 +11,15 @@ module.exports = async (req, res, next) => {
       }
     })
   })
+
+  res.locals.admin = await new Promise(resolve => {
+    jwt.verify(req.headers.token, Config.jwtkey, (err, payload) => {
+      if (err) {
+        resolve(false)
+      } else {
+        resolve((payload || {}).uid)
+      }
+    })
+  })
   next()
 }

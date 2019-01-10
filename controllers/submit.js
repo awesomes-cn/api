@@ -16,7 +16,7 @@ module.exports = {
   // 提取
   get_fetch: async (req, res) => {
     await Auth.isAdmin(req, res)
-    let result = await SubmitHelper.fetch(req.params.id)
+    let result = await SubmitHelper.fetch(req.query.id)
     res.send({ status: result })
   }
 }
