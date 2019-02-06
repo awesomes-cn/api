@@ -2,7 +2,7 @@ const MBlog = require('../models/microblog')
 const Oper = require('../models/oper')
 const Logic = require('../lib/logic')
 const moment = require('moment')
-const phantom = require('phantom')
+// const phantom = require('phantom')
 const aliyun = require('../lib/aliyun')
 const localEnv = require('../config.json')
 const Cache = require('../lib/cache')
@@ -270,24 +270,24 @@ module.exports = {
   },
 
   get_screenshot: async (req, res) => {
-    let item = await MBlog.query({where: {id: req.params.id}}).fetch()
-    if (item.get('screenshot')) {
-      res.send(item.get('screenshot'))
-      return
-    }
+    // let item = await MBlog.query({where: {id: req.params.id}}).fetch()
+    // if (item.get('screenshot')) {
+    //   res.send(item.get('screenshot'))
+    //   return
+    // }
 
-    let filename = `${req.params.id}.png`
-    let distName = `news/screenshot/${filename}`
+    // let filename = `${req.params.id}.png`
+    // let distName = `news/screenshot/${filename}`
 
-    const instance = await phantom.create()
-    const page = await instance.createPage()
-    await page.open(`${localEnv.client.news}/news/${req.params.id}/screenshot`)
-    var base64 = await page.renderBase64('PNG')
-    var buffer = new Buffer(base64, 'base64')
-    await aliyun.upload(buffer, distName)
-    await instance.exit()
-    item.set('screenshot', filename)
-    await item.save()
-    res.send(filename)
+    // const instance = await phantom.create()
+    // const page = await instance.createPage()
+    // await page.open(`${localEnv.client.news}/news/${req.params.id}/screenshot`)
+    // var base64 = await page.renderBase64('PNG')
+    // var buffer = new Buffer(base64, 'base64')
+    // await aliyun.upload(buffer, distName)
+    // await instance.exit()
+    // item.set('screenshot', filename)
+    // await item.save()
+    // res.send(filename)
   }
 }
