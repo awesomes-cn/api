@@ -42,7 +42,11 @@ let fetchRepoReleases = async () => {
   _repos = _repos.toJSON()
   console.log(`有 ${_repos.length} 个前端库需要处理`)
   for (let repo of _repos) {
-    await fetchOne(repo)
+    try {
+      await fetchOne(repo)
+    } catch (ex) {
+      console.log('报错了')
+    }
   }
   process.exit()
 }
