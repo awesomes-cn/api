@@ -1,28 +1,13 @@
-const request = require('request')
+const Release = require('models/release')
 
-let fetchReadme = () => {
-  const readmeUrl = `https://api.github.com/graphql`
-  return new Promise(resolve => {
-    request({
-      method: 'POST',
-      url: readmeUrl,
-      body: JSON.stringify({query: `query
-        {
-          repository(owner: "awesomes-cn", name: "new-awesomes") {
-            name 
-          }
-        }`
-      }),
-      headers: {
-        'User-Agent': 'Awesomes',
-        'content-type': 'application/json',
-        'Authorization': 'bearer a997877ac707ac012114a2d0ded08eff6acddb01'
-      }
-    }, (error, response, body) => {
-      console.log(JSON.parse(body))
-      resolve(JSON.parse(body))
-    })
-  })
+let action = async () => {
+  let item = await Release.forge({
+    repo_id: 1,
+    tag_name: '',
+    published_at: '2019-02-12T17:10:38Z',
+    body: ''
+  }).save()
+  console.log('===', item.id)
 }
 
-fetchReadme()
+action()
