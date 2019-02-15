@@ -1,4 +1,4 @@
-const Release = require('models/release')
+const Release = require('./models/release')
 
 let action = async () => {
   let item = await Release.forge({
